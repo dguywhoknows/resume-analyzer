@@ -13,11 +13,19 @@ const ctx = { console, setTimeout, clearTimeout, Intl, URL, URLSearchParams, Tex
 ctx.globalThis = ctx;
 ctx.window = ctx;
 ctx.self = ctx;
-for (const [name, pkg] of Object.entries(cfg.npm || {})) {
-  ctx[name] = require(require.resolve(pkg, { paths: [process.cwd(), root] }));
-}
 vm.createContext(ctx);
 const load = (file) => vm.runInContext(fs.readFileSync(file, 'utf8'), ctx, { filename: file });
+// "name": "pkg" is required in Node's realm; "name": "pkg/path/bundle.js" is a browser (UMD) build evaluated inside
+// the sandbox, for libraries that type-check objects created by the tests (cross-realm objects fail those checks).
+for (const [name, pkg] of Object.entries(cfg.npm || {})) {
+  if (/\.js$/.test(pkg)) {
+    // resolve by path: package "exports" maps often hide browser bundles from require.resolve
+    const file = [process.cwd(), root].map((d) => path.join(d, 'node_modules', pkg)).find((f) => fs.existsSync(f));
+    if (!file) throw new Error(`cannot find node_modules/${pkg}`);
+    load(file);
+  } else ctx[name] = require(require.resolve(pkg, { paths: [process.cwd(), root] }));
+  if (!ctx[name]) throw new Error(`${pkg} did not define ${name}`);
+}
 
 load(path.join(dir, 'harness.js'));
 scripts.forEach((s) => load(path.join(root, s)));

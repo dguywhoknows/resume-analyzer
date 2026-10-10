@@ -247,3 +247,26 @@ td { font-variant-numeric: tabular-nums; }
 .empty { background: var(--panel); }
 footer.foot { font-size: 12px; }
 ::selection { background: color-mix(in srgb, var(--accent) 25%, transparent); }
+
+/* ---------- account chip ---------- */
+.account { position: relative; }
+.account-menu { position: absolute; right: 0; top: calc(100% + 6px); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-lg); padding: 10px; display: grid; gap: 6px; min-width: 200px; z-index: 60; }
+
+/* ---------- AI command box ---------- */
+.copilot-fab { position: fixed; right: 20px; bottom: 20px; z-index: 70; display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 999px; border: 0; background: var(--accent); color: var(--accent-ink); font: 600 14px Inter, system-ui, sans-serif; box-shadow: var(--shadow-lg); cursor: pointer; }
+.copilot-fab:hover { filter: brightness(1.08); }
+.copilot-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; opacity: .85; box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 25%, transparent); }
+.copilot { position: fixed; right: 20px; bottom: 76px; z-index: 71; width: min(440px, calc(100vw - 32px)); max-height: min(640px, calc(100vh - 110px)); display: flex; flex-direction: column; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-lg); padding: 14px; }
+.copilot .tabs { margin: 0; }
+.copilot [data-pane] { min-height: 0; }
+.copilot textarea { resize: vertical; font-size: 14px; flex: 1; }
+.copilot-log { overflow-y: auto; max-height: 340px; display: flex; flex-direction: column; gap: 8px; }
+.copilot-me { align-self: flex-end; background: var(--accent); color: var(--accent-ink); padding: 8px 12px; border-radius: 12px 12px 4px 12px; font-size: 14px; max-width: 85%; white-space: pre-wrap; }
+.copilot-ai { align-self: flex-start; background: var(--panel-2); padding: 8px 12px; border-radius: 12px 12px 12px 4px; font-size: 14px; max-width: 92%; white-space: pre-wrap; }
+.copilot-ai.err { color: var(--bad); }
+.copilot-step { font-size: 12px; margin-top: 4px; padding-left: 14px; position: relative; color: var(--muted); }
+.copilot-step::before { content: ''; position: absolute; left: 2px; top: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--good); }
+.copilot-step.bad::before { background: var(--bad); }
+.copilot-ex { display: flex; flex-wrap: wrap; gap: 6px; }
+.copilot-ex .btn { font-weight: 500; text-align: left; white-space: normal; }
+@media print { .copilot, .copilot-fab { display: none !important; } }

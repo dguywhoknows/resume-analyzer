@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en" data-gate="app">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resume Match</title>
+<meta name="description" content="ATS-style keyword coverage, bullet-quality linting and AI rewrites to tailor your resume to a job.">
+<meta name="app-repo" content="https://github.com/dguywhoknows/resume-analyzer">
+<meta name="app-version" content="2.0.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f8f5f'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-family='Arial%2CHelvetica%2Csans-serif' font-weight='700' font-size='13' fill='white'%3ERM%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/app.css">
+<script src="src/lib/config.js"></script>
+<script src="src/lib/auth.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><a class="logo-link" href="index.html" aria-label="Home page"><span class="logo" aria-hidden="true">RM</span></a><div><h1>Resume Match</h1><p>See your resume the way an ATS and a recruiter would.</p></div></div>
+  <nav class="topnav" data-nav aria-label="Pages"></nav>
+  <div class="top-actions"><a class="btn ghost sm" href="https://github.com/dguywhoknows/resume-analyzer" target="_blank" rel="noopener">GitHub</a><span data-ai-badge></span></div>
+</header>
+<div class="page active" data-page="analyze" data-title="Analyze">
+<main class="stack">
+  <div class="card row">
+    <label class="inline">Resume <select id="aResume" style="width:auto"></select></label>
+    <label class="inline">Job <select id="aJob" style="width:auto"></select></label>
+    <span class="grow"></span>
+    <button class="btn sm ghost" id="saveResumeVer">Save resume as new version</button>
+    <button class="btn sm ghost" id="saveJob">Save job to tracker</button>
+  </div>
+  <div class="grid cols-2">
+    <section class="card stack">
+      <div class="row between"><h2 style="margin:0">Resume</h2><label class="btn sm" style="color:var(--text)">Import .pdf / .txt<input type="file" id="file" accept=".pdf,.txt,.md" hidden></label></div>
+      <textarea id="resume" rows="16" spellcheck="false"></textarea>
+    </section>
+    <section class="card stack">
+      <h2 style="margin:0">Job description</h2>
+      <textarea id="jd" rows="16" spellcheck="false"></textarea>
+    </section>
+  </div>
+  <div class="row"><button class="btn primary" id="analyze">Analyze match</button><span class="small muted">Keyword and bullet analysis runs in the browser. The AI review is optional.</span></div>
+
+  <div id="results" class="hidden stack">
+    <div class="grid cols-3">
+      <div class="card score-card"><div id="gauge"></div><div><div class="k muted small">ATS keyword coverage</div><div class="small" id="covNote"></div></div></div>
+      <div class="card"><h3>Bullet quality</h3><div id="bulletSummary"></div></div>
+      <div class="card"><h3>Sections found</h3><div id="sections" class="row"></div></div>
+    </div>
+    <div class="card">
+      <div class="row between"><h2 style="margin:0">Keywords from the job</h2><span class="small muted">weighted by frequency and position in the job post</span></div>
+      <div id="keywords" class="chips"></div>
+    </div>
+    <div class="card">
+      <div class="row between"><h2 style="margin:0">Bullet-by-bullet review</h2><span class="small muted">use Rewrite for suggested alternatives</span></div>
+      <div id="bullets"></div>
+    </div>
+    <div class="card">
+      <div class="tabs"><button class="on" data-t="review">AI recruiter review</button><button data-t="summary">Tailored summary</button></div>
+      <div id="t-review"><button class="btn" id="reviewBtn">Run AI review</button><div id="review" style="margin-top:12px"></div></div>
+      <div id="t-summary" class="hidden"><button class="btn" id="summaryBtn">Write tailored summary</button><div id="summary" class="prose" style="margin-top:12px"></div></div>
+    </div>
+  </div>
+</main>
+</div>
+
+<div class="page" data-page="resumes" data-title="Resumes">
+<main class="stack">
+  <div class="page-head"><div><h2>Resume versions</h2><p>Keep tailored versions side by side and see what changed between them.</p></div>
+    <button class="btn primary" id="newResume">+ New version</button></div>
+  <div class="grid side">
+    <div class="card"><div id="resumeList"></div></div>
+    <div class="stack">
+      <div class="card stack" id="resumeDetail"></div>
+      <div class="card stack">
+        <div class="row between"><h2 style="margin:0">Compare versions</h2><div class="row"><select id="cmpA" style="width:auto"></select><span>→</span><select id="cmpB" style="width:auto"></select></div></div>
+        <div id="cmpOut"></div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<div class="page" data-page="jobs" data-title="Jobs">
+<main class="stack">
+  <div class="page-head"><div><h2>Application tracker</h2><p id="pipeSummary"></p></div>
+    <button class="btn primary" id="newJob">+ Add job</button></div>
+  <div class="kpis" id="pipeKpis"></div>
+  <div class="board" id="board"></div>
+  <div class="card stack hidden" id="jobDetail"></div>
+</main>
+</div>
+
+<div class="page" data-page="letters" data-title="Letters">
+<main class="grid side">
+  <div class="card stack">
+    <h2 style="margin:0">Cover letters</h2>
+    <div class="grid cols-2"><label>Job<select id="lJob"></select></label><label>Tone<select id="tone"><option>confident</option><option>warm</option><option>concise</option></select></label></div>
+    <button class="btn primary" id="letterBtn">Draft new letter</button>
+    <div id="letterList"></div>
+  </div>
+  <div class="card stack">
+    <div class="row between"><input class="input grow" id="letterTitle" placeholder="Letter title"><div class="row"><span class="small muted" id="letterWords"></span><button class="btn sm" id="copyLetter">Copy</button><button class="btn sm" id="dlLetter">Download .txt</button><button class="btn sm ghost danger" id="delLetter">Delete</button></div></div>
+    <textarea id="letter" class="letter-edit" placeholder="Pick a letter on the left, or draft a new one."></textarea>
+    <div class="row"><button class="btn sm ghost" data-polish="shorter">Make it shorter</button><button class="btn sm ghost" data-polish="more specific">More specific</button><button class="btn sm ghost" data-polish="warmer">Warmer</button><button class="btn sm ghost" data-polish="more formal">More formal</button></div>
+  </div>
+</main>
+</div>
+
+<div class="page" data-page="settings" data-title="Settings"></div>
+<script src="src/lib/dom.js"></script>
+<script src="src/lib/ai.js"></script>
+<script src="src/lib/router.js"></script>
+<script src="src/lib/copilot.js"></script>
+<script src="src/core.js"></script>
+<script src="src/demo.js"></script>
+<script src="src/app.js"></script>
+</body>
+</html>

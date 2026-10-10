@@ -58,7 +58,9 @@
     const version = document.querySelector('meta[name="app-version"]')?.content || '1.0.0';
     const main = h('main', { class: 'settings stack' });
     const aiState = h('div', { class: 'small muted' });
-    const syncAI = () => { const m = window.AI ? AI.mode() : 'demo'; aiState.textContent = m === 'demo' ? 'Demo mode: AI features use built-in sample output.' : `Live AI via ${AI.providers[m].name}.`; };
+    const syncAI = () => { const m = window.AI ? AI.mode() : 'demo'; aiState.textContent = (m === 'demo' ? 'Demo mode: AI features use built-in sample output.' : `Live AI via ${AI.providers[m].name}.`) + (window.AI && AI.instructions() ? ' Your standing instructions are on.' : ''); };
+    const account = window.Auth && Auth.enabled ? h('section', { class: 'card stack' }, h('h3', {}, 'Account'), h('div', { class: 'small' }, Auth.user ? `Signed in as ${Auth.user.email}` : 'Not signed in'),
+      h('div', { class: 'row' }, h('button', { class: 'btn', onclick: () => Auth.signOut() }, 'Sign out')), h('p', { class: 'small muted' }, 'Your account works across every app on this site. Data you create is stored in this browser.')) : null;
     window.addEventListener('ai:change', syncAI);
     const theme = h('select', { 'aria-label': 'Theme', onchange: (e) => { store.set('theme', e.target.value); applyTheme(e.target.value); } },
       ['system', 'light', 'dark'].map((t) => h('option', { value: t, selected: store.get('theme', 'system') === t }, t[0].toUpperCase() + t.slice(1))));
@@ -80,8 +82,9 @@
     } });
     main.append(
       h('h2', {}, 'Settings'),
-      h('section', { class: 'card stack' }, h('h3', {}, 'AI provider'), aiState, h('div', { class: 'row' }, h('button', { class: 'btn', onclick: () => AI.openSettings() }, 'Configure provider…')),
-        h('p', { class: 'small muted' }, 'Keys are stored only in this browser, for this app, and are sent only to the provider you choose.')),
+      ...(account ? [account] : []),
+      h('section', { class: 'card stack' }, h('h3', {}, 'AI'), aiState, h('div', { class: 'row' }, h('button', { class: 'btn', onclick: () => AI.openSettings() }, 'Model provider…'), window.Copilot ? h('button', { class: 'btn', onclick: () => { Copilot.open(); document.querySelector('.copilot [data-t=prefs]')?.click(); } }, 'Standing instructions…') : null),
+        h('p', { class: 'small muted' }, 'Your own API keys, if you add any, are stored only in this browser and sent only to the provider you choose.')),
       h('section', { class: 'card stack' }, h('h3', {}, 'Appearance'), h('label', {}, 'Theme', theme)),
       h('section', { class: 'card stack' }, h('h3', {}, 'Your data'), usage,
         h('div', { class: 'row' },

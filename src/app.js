@@ -52,10 +52,10 @@ function analyze() {
   $('#results').classList.remove('hidden');
   $('#gauge').innerHTML = gauge(m.pct);
   $('#covNote').innerHTML = `${m.kws.filter((x) => x.hit).length}/${m.kws.length} weighted keywords found. ${m.pct < 60 ? 'Aim for 60–80%. Work the <b style="color:var(--bad)">red</b> ones in where they are true.' : 'Solid coverage. Make sure the top keywords also show up in your bullets.'}`;
-  $('#keywords').innerHTML = m.kws.map((x) => `<span class="chip ${x.hit ? 'hit' : 'miss'}">${x.hit ? '✓' : '✗'} ${esc(x.k)}<small>${x.w}</small></span>`).join('');
+  $('#keywords').innerHTML = m.kws.map((x) => `<span class="chip ${x.hit ? 'hit' : 'miss'}">${esc(x.k)}<small>${x.w}</small></span>`).join('');
   const avg = bl.length ? Math.round(bl.reduce((a, x) => a + x.score, 0) / bl.length) : 0;
   $('#bulletSummary').innerHTML = `<div class="stat" style="margin-top:8px"><div class="v">${avg}<span class="small muted">/100</span></div><div class="k">${bl.length} bullets · ${bl.filter((x) => /\d|%|\$/.test(x.b)).length} quantified</div></div><div class="bar" style="margin-top:10px"><span style="width:${avg}%"></span></div>`;
-  $('#sections').innerHTML = ['Summary', 'Experience', 'Education', 'Skills', 'Projects', 'Certifications'].map((s) => `<span class="tag ${secs[s] ? 'good' : ''}">${secs[s] ? '✓' : '○'} ${s}</span>`).join('');
+  $('#sections').innerHTML = ['Summary', 'Experience', 'Education', 'Skills', 'Projects', 'Certifications'].map((s) => `<span class="tag ${secs[s] ? 'good' : ''}">${s}</span>`).join('');
   const box = $('#bullets');
   box.innerHTML = '';
   if (!bl.length) box.append(h('div', { class: 'empty' }, 'No bullets found. Start bullet lines with "-" or "•".'));
@@ -74,7 +74,7 @@ async function rewrite(b, out) {
     { role: 'user', content: `Bullet: ${b}\nJob keywords not yet covered: ${missing()}\nJob description (excerpt): ${last.jd.slice(0, 1500)}` },
   ], { json: true, temperature: 0.7, demo: { variants: [`Built ${b.replace(/^(helped|worked on|responsible for)\s*/i, '').replace(/\.$/, '')}, cutting [X%] of manual effort for [N] users.`, `Delivered ${b.split(' ').slice(1, 6).join(' ')}… in [N] weeks, improving [metric] by [X%] through automated testing.`, `Owned end-to-end ${b.split(' ').slice(-4).join(' ').replace(/\.$/, '')}, partnering with [team] to ship to [N] customers.`], tip: 'Replace every [placeholder] with a real number. Even an estimate ("~30%") beats no metric. (demo)' } });
   out.innerHTML = '';
-  out.append(h('div', { class: 'rewrite' }, h('b', {}, 'Rewrites'), h('ol', {}, (r.variants || []).map((v) => h('li', {}, v, ' ', h('button', { class: 'btn sm ghost', title: 'Use this in the resume', onclick: () => { $('#resume').value = $('#resume').value.replace(b, v); analyze(); toast('Bullet replaced. Save it as a new version when you are happy.'); } }, 'use')))), r.tip ? h('div', { class: 'small muted', style: 'margin-top:6px' }, '💡 ' + r.tip) : null));
+  out.append(h('div', { class: 'rewrite' }, h('b', {}, 'Rewrites'), h('ol', {}, (r.variants || []).map((v) => h('li', {}, v, ' ', h('button', { class: 'btn sm ghost', title: 'Use this in the resume', onclick: () => { $('#resume').value = $('#resume').value.replace(b, v); analyze(); toast('Bullet replaced. Save it as a new version when you are happy.'); } }, 'use')))), r.tip ? h('div', { class: 'small muted', style: 'margin-top:6px' }, 'Tip: ' + r.tip) : null));
 }
 async function review() {
   if (!last) analyze();
@@ -216,7 +216,7 @@ function renderJobDetail() {
   const f = (k, label, el = 'input') => { const x = h(el, { class: el === 'input' ? 'input' : '', rows: el === 'textarea' ? 6 : null }); x.value = j[k] || ''; x.dataset.k = k; return h('label', {}, label, x); };
   const m = matchJob(activeResume().text, j.jd);
   box.innerHTML = '';
-  box.append(h('div', { class: 'row between' }, h('h2', { style: 'margin:0' }, `${j.title}${j.company ? ' · ' + j.company : ''}`), h('button', { class: 'btn ghost sm', onclick: () => { selJob = null; renderJobDetail(); } }, '✕')),
+  box.append(h('div', { class: 'row between' }, h('h2', { style: 'margin:0' }, `${j.title}${j.company ? ' · ' + j.company : ''}`), h('button', { class: 'btn ghost sm', onclick: () => { selJob = null; renderJobDetail(); } }, 'Close')),
     h('div', { class: 'grid cols-3' }, f('title', 'Title'), f('company', 'Company'), f('url', 'Posting URL')),
     h('div', { class: 'grid cols-2' }, h('label', {}, 'Status', h('select', { 'data-k': 'status' }, STAGES.map((s) => h('option', { value: s, selected: j.status === s }, s)))), f('contact', 'Contact')),
     f('notes', 'Notes', 'textarea'), f('jd', 'Job description', 'textarea'),
@@ -278,3 +278,22 @@ $('#resume').value = activeResume().text;
 $('#aJob').value = S.jobs[0]?.id || '';
 $('#jd').value = S.jobs[0]?.jd || DEMO.jd;
 analyze();
+
+/* ================= AI command box ================= */
+const jobNamed = (q) => { const s = String(q).toLowerCase(); const j = S.jobs.find((x) => `${x.title} ${x.company}`.toLowerCase().includes(s)) || S.jobs.find((x) => s.split(/\s+/).every((w) => `${x.title} ${x.company}`.toLowerCase().includes(w))); if (!j) throw new Error(`No job like "${q}"`); return j; };
+Copilot.register({
+  context: () => `Active resume "${activeResume().name}". Analyze page: ${last ? `keyword coverage ${last.pct}%, missing: ${missing()}; ${last.bl.length} bullets, weakest: ${last.bl.slice().sort((a, b) => a.score - b.score).slice(0, 3).map((x) => `"${x.b}" (${x.score})`).join('; ')}` : 'not analyzed'}. Jobs: ${S.jobs.map((j) => `${j.title} at ${j.company || '?'} [${j.status}, ${j.match ?? '?'}%]`).join('; ')}. Resume versions: ${S.resumes.map((r) => r.name).join(' | ')}. Letters: ${S.letters.length}.`,
+  actions: [
+    { name: 'match_job', description: 'Score the active resume against a job: pasted text or a tracked job', params: { job_description: 'optional pasted job text', job: 'optional tracked job title/company' },
+      run: ({ job_description, job }) => { Router.go('analyze'); fillSelectors(); $('#resume').value = activeResume().text; if (job) { const j = jobNamed(job); $('#aJob').value = j.id; $('#jd').value = j.jd; } else if (job_description) { $('#aJob').value = ''; $('#jd').value = job_description; } analyze(); return `Coverage ${last.pct}%. Missing: ${missing() || 'nothing important'}`; } },
+    { name: 'rewrite_weakest_bullets', description: 'Rewrite the lowest-scoring bullets with stronger verbs and numbers (variants appear under each bullet)', params: { count: 'how many, default 3' },
+      run: async ({ count }) => { if (!last) analyze(); Router.go('analyze'); const rows = $$('#bullets .bl'), picks = last.bl.map((x, i) => ({ x, i })).sort((a, b) => a.x.score - b.x.score).slice(0, +count || 3), out = []; for (const { x, i } of picks) { const el = rows[i].children[1].lastChild; await rewrite(x.b, el); out.push(`"${x.b}" -> ${el.innerText.replace(/Use$/gm, '').slice(0, 300)}`); } return out.join('\n'); } },
+    { name: 'recruiter_review', description: 'Get a recruiter-style fit review of resume vs job', params: {}, run: async () => { Router.go('analyze'); $$('#results .tabs button').find((b) => b.dataset.t === 'review')?.click(); await review(); return $('#review').innerText.slice(0, 900); } },
+    { name: 'tailored_summary', description: 'Write a 3-sentence resume summary for the job', params: {}, run: async () => { Router.go('analyze'); $$('#results .tabs button').find((b) => b.dataset.t === 'summary')?.click(); await summary(); return $('#summary').innerText; } },
+    { name: 'cover_letter', description: 'Draft a cover letter for a tracked job (or the job on the Analyze page)', params: { job: 'optional tracked job', tone: [...$('#tone').options].map((o) => o.value).join(' | ') },
+      run: async ({ job, tone }) => { Router.go('letters'); fillSelectors(); $('#lJob').value = job ? jobNamed(job).id : ''; if (tone && [...$('#tone').options].some((o) => o.value === tone)) $('#tone').value = tone; await $('#letterBtn').onclick({ currentTarget: $('#letterBtn') }); return `Drafted ${($('#letter').value.match(/\S+/g) || []).length} words`; } },
+    { name: 'track_job', description: 'Add the job on the Analyze page (or pasted text) to the tracker', params: { job_description: 'optional pasted job text' }, run: ({ job_description }) => { if (job_description) $('#jd').value = job_description; $('#saveJob').click(); return 'Added to the tracker'; } },
+    { name: 'set_job_status', description: 'Move a tracked job to a stage', params: { job: 'title or company', status: STAGES.join(' | '), notes: 'optional note to append' }, run: ({ job, status, notes }) => { const j = jobNamed(job); if (!STAGES.includes(status)) throw new Error('Stages: ' + STAGES.join(', ')); j.status = status; if (notes) j.notes = (j.notes ? j.notes + '\n' : '') + notes; j.updated = Date.now(); save(); Router.go('jobs'); renderJobs(); return `${j.title}: ${status}`; } },
+    { name: 'pipeline', query: true, description: 'Look up the job pipeline and response rates', params: {}, run: () => JSON.stringify({ stats: pipelineStats(S.jobs, Date.now()), jobs: S.jobs.map((j) => ({ title: j.title, company: j.company, status: j.status, match: j.match, daysSinceUpdate: Math.floor((Date.now() - j.updated) / 864e5), notes: j.notes })) }) },
+  ],
+});

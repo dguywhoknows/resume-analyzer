@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in · Resume Match</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f8f5f'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-family='Arial,Helvetica,sans-serif' font-weight='700' font-size='13' fill='white'%3ERM%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/landing.css">
+<style>:root { --accent: #1f8f5f; }</style>
+<script src="src/lib/config.js"></script>
+<script src="src/lib/auth.js"></script>
+</head>
+<body class="landing auth-page">
+<main class="auth-wrap">
+  <a class="l-brand" href="index.html"><span class="logo">RM</span><b>Resume Match</b></a>
+  <div class="card auth-card">
+    <div class="tabs" role="tablist"><button class="on" data-mode="in" role="tab">Sign in</button><button data-mode="up" role="tab">Create account</button></div>
+    <form id="authForm" class="stack" novalidate>
+      <label>Email<input class="input" type="email" id="email" autocomplete="email" required></label>
+      <label>Password<input class="input" type="password" id="password" autocomplete="current-password" minlength="8" required></label>
+      <button class="btn primary big" type="submit" id="submit">Sign in</button>
+      <button class="btn ghost sm" type="button" id="forgot">Forgot password?</button>
+      <div id="google" class="hidden"><div class="auth-or"><span>or</span></div><button class="btn big" type="button" id="googleBtn" style="width:100%">Continue with Google</button></div>
+      <p class="small" id="msg" role="status"></p>
+    </form>
+    <div id="setup" class="hidden stack"><p>Accounts are being set up. You can use Resume Match as a guest in the meantime; your work is saved in this browser.</p><a class="btn primary big" href="app.html">Continue as guest</a></div>
+  </div>
+  <p class="small muted">One account works for every app on this site. <a href="index.html">Back to the home page</a></p>
+</main>
+<script>
+(function () {
+  const next = new URLSearchParams(location.search).get('next') || 'app.html';
+  const dest = /^[\w.-]+\.html(#.*)?$/.test(next) ? next : 'app.html';
+  const $ = (s) => document.querySelector(s), msg = (t, bad) => { $('#msg').textContent = t; $('#msg').style.color = bad ? 'var(--bad)' : 'var(--muted)'; };
+  if (!Auth.enabled) { $('#authForm').classList.add('hidden'); document.querySelector('.tabs').classList.add('hidden'); $('#setup').classList.remove('hidden'); return; }
+  if (Auth.token()) { location.replace(dest); return; }
+  if (window.APP_CONFIG.google) $('#google').classList.remove('hidden');
+  let mode = 'in';
+  document.querySelectorAll('[data-mode]').forEach((b) => (b.onclick = () => { mode = b.dataset.mode; document.querySelectorAll('[data-mode]').forEach((x) => x.classList.toggle('on', x === b)); $('#submit').textContent = mode === 'in' ? 'Sign in' : 'Create account'; $('#password').autocomplete = mode === 'in' ? 'current-password' : 'new-password'; msg(''); }));
+  $('#authForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const email = $('#email').value.trim(), password = $('#password').value;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return msg('Enter a valid email address.', true);
+    if (password.length < 8) return msg('Use at least 8 characters for the password.', true);
+    $('#submit').disabled = true; msg(mode === 'in' ? 'Signing in…' : 'Creating your account…');
+    try {
+      const c = await Auth.client();
+      const r = mode === 'in' ? await c.auth.signInWithPassword({ email, password }) : await c.auth.signUp({ email, password, options: { emailRedirectTo: location.href.replace(/login\.html.*$/, 'app.html') } });
+      if (r.error) throw r.error;
+      if (mode === 'up' && !r.data.session) { msg('Check your inbox to confirm your email, then sign in.'); $('#submit').disabled = false; return; }
+      location.replace(dest);
+    } catch (err) { msg(err.message || 'Something went wrong.', true); $('#submit').disabled = false; }
+  };
+  $('#forgot').onclick = async () => {
+    const email = $('#email').value.trim();
+    if (!email) return msg('Type your email first, then press "Forgot password?".', true);
+    try { const c = await Auth.client(); const r = await c.auth.resetPasswordForEmail(email, { redirectTo: location.href.split('?')[0] }); if (r.error) throw r.error; msg('If that address has an account, a reset link is on its way.'); } catch (err) { msg(err.message, true); }
+  };
+  $('#googleBtn').onclick = async () => { const c = await Auth.client(); await c.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.href.replace(/login\.html.*$/, dest) } }); };
+})();
+</script>
+</body>
+</html>

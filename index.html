@@ -3,115 +3,81 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Resume Match</title>
-<meta name="description" content="ATS-style keyword coverage, bullet-quality linting and AI rewrites to tailor your resume to a job.">
-<meta name="app-repo" content="https://github.com/dguywhoknows/resume-analyzer">
-<meta name="app-version" content="2.0.0">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f8f5f'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-family='Arial%2CHelvetica%2Csans-serif' font-weight='700' font-size='13' fill='white'%3ERM%3C/text%3E%3C/svg%3E">
+<title>Resume Match: See your resume the way the hiring software does</title>
+<meta name="description" content="Keyword coverage against the job, bullet-by-bullet quality checks, and AI rewrites that tailor every line.">
+<meta property="og:title" content="Resume Match">
+<meta property="og:description" content="Keyword coverage against the job, bullet-by-bullet quality checks, and AI rewrites that tailor every line.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f8f5f'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-family='Arial,Helvetica,sans-serif' font-weight='700' font-size='13' fill='white'%3ERM%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles/base.css">
-<link rel="stylesheet" href="styles/app.css">
+<link rel="stylesheet" href="styles/landing.css">
+<style>:root { --accent: #1f8f5f; }</style>
 </head>
-<body>
-<header class="topbar">
-  <div class="brand"><span class="logo" aria-hidden="true">RM</span><div><h1>Resume Match</h1><p>See your resume the way an ATS and a recruiter would.</p></div></div>
-  <nav class="topnav" data-nav aria-label="Pages"></nav>
-  <div class="top-actions"><a class="btn ghost sm" href="https://github.com/dguywhoknows/resume-analyzer" target="_blank" rel="noopener">GitHub</a><span data-ai-badge></span></div>
+<body class="landing">
+<header class="l-nav">
+  <a class="l-brand" href="#top"><span class="logo">RM</span><b>Resume Match</b></a>
+  <nav aria-label="Sections"><a href="#demo">Demo</a><a href="#ask">Ask it</a><a href="#features">Features</a><a href="#faq">FAQ</a></nav>
+  <div class="l-nav-cta"><a class="btn primary" href="app.html">Open the app</a></div>
 </header>
-<div class="page active" data-page="analyze" data-title="Analyze">
-<main class="stack">
-  <div class="card row">
-    <label class="inline">Resume <select id="aResume" style="width:auto"></select></label>
-    <label class="inline">Job <select id="aJob" style="width:auto"></select></label>
-    <span class="grow"></span>
-    <button class="btn sm ghost" id="saveResumeVer">Save resume as new version</button>
-    <button class="btn sm ghost" id="saveJob">Save job to tracker</button>
-  </div>
-  <div class="grid cols-2">
-    <section class="card stack">
-      <div class="row between"><h2 style="margin:0">Resume</h2><label class="btn sm" style="color:var(--text)">Import .pdf / .txt<input type="file" id="file" accept=".pdf,.txt,.md" hidden></label></div>
-      <textarea id="resume" rows="16" spellcheck="false"></textarea>
-    </section>
-    <section class="card stack">
-      <h2 style="margin:0">Job description</h2>
-      <textarea id="jd" rows="16" spellcheck="false"></textarea>
-    </section>
-  </div>
-  <div class="row"><button class="btn primary" id="analyze">Analyze match</button><span class="small muted">Keyword and bullet analysis runs in the browser. The AI review is optional.</span></div>
 
-  <div id="results" class="hidden stack">
-    <div class="grid cols-3">
-      <div class="card score-card"><div id="gauge"></div><div><div class="k muted small">ATS keyword coverage</div><div class="small" id="covNote"></div></div></div>
-      <div class="card"><h3>Bullet quality</h3><div id="bulletSummary"></div></div>
-      <div class="card"><h3>Sections found</h3><div id="sections" class="row"></div></div>
+<main id="top">
+  <section class="l-hero">
+    <p class="l-kicker">Free · runs in your browser · AI built in</p>
+    <h1>See your resume the way the hiring software does.</h1>
+    <p class="l-sub">Keyword coverage against the job, bullet-by-bullet quality checks, and AI rewrites that tailor every line.</p>
+    <div class="l-actions"><a class="btn primary big" href="app.html">Open the app</a><a class="btn big" href="#demo">See it working</a></div>
+  </section>
+
+  <section class="l-demo reveal" id="demo">
+    <div class="l-window"><div class="l-window-bar"><i></i><i></i><i></i><span>Resume Match</span></div>
+      <iframe src="app.html?embed=1" title="Resume Match live demo" loading="lazy"></iframe></div>
+    <p class="l-caption">This is the real app running below, not a recording. Try it.</p>
+  </section>
+
+  <section class="l-section reveal" id="ask">
+    <div class="l-head"><p class="l-kicker">Just say what you want</p><h2>Tell it in plain words. It uses its own tools to do it.</h2>
+      <p>Open the AI box in the app, type a request, and the AI drives the app's real features for you: it sets things up, edits, runs and reports back. Standing instructions let you shape every AI feature to how you like to work.</p></div>
+    <div class="l-prompts"><div class="l-prompt"><div class="say">Score my resume against this job posting</div><div class="does">Runs the match and shows missing keywords.</div></div><div class="l-prompt"><div class="say">Rewrite my weakest three bullets with numbers</div><div class="does">Finds the lowest-scoring bullets and rewrites them.</div></div><div class="l-prompt"><div class="say">Write a short cover letter for this role</div><div class="does">Drafts a letter from your resume and the job.</div></div></div>
+  </section>
+
+  <section class="l-section reveal" id="features">
+    <div class="l-head"><p class="l-kicker">What it does</p><h2>Everything in one place</h2></div>
+    <div class="l-grid"><div class="l-card"><h3>Weighted keyword extraction</h3><p>Weighted keyword extraction (unigrams, bigrams, known phrases, requirement-section boosting)</p></div><div class="l-card"><h3>Synonym</h3><p>Synonym + stem-aware matching (JS → JavaScript, k8s → Kubernetes, …) with coverage gauge</p></div><div class="l-card"><h3>Bullet linter</h3><p>Action verb, quantified outcome, length, first person, passive voice, buzzwords</p></div><div class="l-card"><h3>Section detection</h3><p>Section detection (Summary, Experience, Education, Skills, Projects, Certifications)</p></div><div class="l-card"><h3>PDF resume import</h3><p>PDF resume import via pdf.js with line reconstruction</p></div><div class="l-card"><h3>AI recruiter review</h3><p>AI recruiter review, per-bullet XYZ rewrites with [placeholders], tailored summary, cover letter</p></div><div class="l-card"><h3>Resumes page</h3><p>Keep multiple versions, each with a job-independent quality score broken down into bullets, sections, contact details, length and quantification</p></div><div class="l-card"><h3>Version compare</h3><p>Line-level diff (LCS) with quality and job-match deltas</p></div><div class="l-card"><h3>Jobs page</h3><p>Drag-and-drop application tracker (saved / applied / interview / offer / rejected) with live match % per job, response rate and stale-application alerts</p></div></div>
+  </section>
+
+  <section class="l-section reveal">
+    <div class="l-head"><p class="l-kicker">How it works</p><h2>Real engines where it counts, AI where it helps</h2></div>
+    <div class="l-steps">
+      <div><span>1</span><h3>Open the app</h3><p>No sign-up needed right now. Everything runs in your browser.</p></div>
+      <div><span>2</span><h3>Ask in your own words</h3><p>Type or click. The AI handles structured JSON recruiter review grounded in locally computed coverage + missing keywords; bullet rewriting constrained to never fabricate metrics; streaming cover-letter generation with tone control.</p></div>
+      <div><span>3</span><h3>Keep what you make</h3><p>Your work is saved in your browser and can be exported any time.</p></div>
     </div>
-    <div class="card">
-      <div class="row between"><h2 style="margin:0">Keywords from the job</h2><span class="small muted">weighted by frequency and position in the job post</span></div>
-      <div id="keywords" class="chips"></div>
+    <p class="l-note">Computed locally, with no AI involved: keyword extraction, matching, bullet linting, section detection, PDF parsing.</p>
+  </section>
+
+  <section class="l-section reveal" id="faq">
+    <div class="l-head"><p class="l-kicker">Questions</p><h2>Good to know</h2></div>
+    <div class="l-faq">
+      <details><summary>Is it free?</summary><p>Yes. Every feature is free. </p></details>
+      <details><summary>Where is my data stored?</summary><p>What you create stays in this browser on this device. You can export a backup or delete everything from Settings.</p></details>
+      <details><summary>Do I need an API key?</summary><p>Not to try it: the app runs in demo mode with sample AI output. For live AI, connect a free Groq or OpenRouter key in Settings.</p></details>
+      <details><summary>What can I type into the AI box?</summary><p>Anything you would ask a helpful colleague who knows the app, such as: "Score my resume against this job posting". It plans the steps, runs the app's own functions and tells you what it did. The Instructions tab saves preferences every AI feature follows.</p></details>
+      <details><summary>Can I see the code?</summary><p>Yes. It is open source under the MIT license on <a href="https://github.com/dguywhoknows/resume-analyzer" rel="noopener">GitHub</a>, with a <a href="tests/">public test suite</a>.</p></details>
     </div>
-    <div class="card">
-      <div class="row between"><h2 style="margin:0">Bullet-by-bullet review</h2><span class="small muted">use Rewrite for suggested alternatives</span></div>
-      <div id="bullets"></div>
-    </div>
-    <div class="card">
-      <div class="tabs"><button class="on" data-t="review">AI recruiter review</button><button data-t="summary">Tailored summary</button></div>
-      <div id="t-review"><button class="btn" id="reviewBtn">Run AI review</button><div id="review" style="margin-top:12px"></div></div>
-      <div id="t-summary" class="hidden"><button class="btn" id="summaryBtn">Write tailored summary</button><div id="summary" class="prose" style="margin-top:12px"></div></div>
-    </div>
-  </div>
+  </section>
+
+  <section class="l-final reveal">
+    <h2>See your resume the way the hiring software does.</h2>
+    <a class="btn primary big" href="app.html">Open the app</a>
+  </section>
 </main>
-</div>
 
-<div class="page" data-page="resumes" data-title="Resumes">
-<main class="stack">
-  <div class="page-head"><div><h2>Resume versions</h2><p>Keep tailored versions side by side and see what changed between them.</p></div>
-    <button class="btn primary" id="newResume">+ New version</button></div>
-  <div class="grid side">
-    <div class="card"><div id="resumeList"></div></div>
-    <div class="stack">
-      <div class="card stack" id="resumeDetail"></div>
-      <div class="card stack">
-        <div class="row between"><h2 style="margin:0">Compare versions</h2><div class="row"><select id="cmpA" style="width:auto"></select><span>→</span><select id="cmpB" style="width:auto"></select></div></div>
-        <div id="cmpOut"></div>
-      </div>
-    </div>
-  </div>
-</main>
-</div>
-
-<div class="page" data-page="jobs" data-title="Jobs">
-<main class="stack">
-  <div class="page-head"><div><h2>Application tracker</h2><p id="pipeSummary"></p></div>
-    <button class="btn primary" id="newJob">+ Add job</button></div>
-  <div class="kpis" id="pipeKpis"></div>
-  <div class="board" id="board"></div>
-  <div class="card stack hidden" id="jobDetail"></div>
-</main>
-</div>
-
-<div class="page" data-page="letters" data-title="Letters">
-<main class="grid side">
-  <div class="card stack">
-    <h2 style="margin:0">Cover letters</h2>
-    <div class="grid cols-2"><label>Job<select id="lJob"></select></label><label>Tone<select id="tone"><option>confident</option><option>warm</option><option>concise</option></select></label></div>
-    <button class="btn primary" id="letterBtn">Draft new letter</button>
-    <div id="letterList"></div>
-  </div>
-  <div class="card stack">
-    <div class="row between"><input class="input grow" id="letterTitle" placeholder="Letter title"><div class="row"><span class="small muted" id="letterWords"></span><button class="btn sm" id="copyLetter">Copy</button><button class="btn sm" id="dlLetter">Download .txt</button><button class="btn sm ghost danger" id="delLetter">Delete</button></div></div>
-    <textarea id="letter" class="letter-edit" placeholder="Pick a letter on the left, or draft a new one."></textarea>
-    <div class="row"><button class="btn sm ghost" data-polish="shorter">Make it shorter</button><button class="btn sm ghost" data-polish="more specific">More specific</button><button class="btn sm ghost" data-polish="warmer">Warmer</button><button class="btn sm ghost" data-polish="more formal">More formal</button></div>
-  </div>
-</main>
-</div>
-
-<div class="page" data-page="settings" data-title="Settings"></div>
-<script src="src/lib/dom.js"></script>
-<script src="src/lib/ai.js"></script>
-<script src="src/lib/router.js"></script>
-<script src="src/core.js"></script>
-<script src="src/demo.js"></script>
-<script src="src/app.js"></script>
+<footer class="l-foot"><span>Resume Match</span><span><a href="https://github.com/dguywhoknows/resume-analyzer" rel="noopener">Source</a> · <a href="tests/">Tests</a> · MIT license</span></footer>
+<script>
+document.querySelectorAll('.reveal').forEach((el) => el.classList.add('pre'));
+const io = new IntersectionObserver((es) => es.forEach((x) => { if (x.isIntersecting) { x.target.classList.remove('pre'); io.unobserve(x.target); } }), { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+</script>
 </body>
 </html>

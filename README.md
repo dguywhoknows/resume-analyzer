@@ -54,12 +54,21 @@ python -m http.server 8000
 
 Then open http://localhost:8000.
 
+`index.html` is the public home page, `login.html` handles accounts and `app.html` is the app.
+
+### Telling the app what to do
+
+Every page has an **Ask AI** box (Ctrl/Cmd+K). Type a request in plain words and the model plans a sequence of
+calls to the app's own functions, runs them and reports back. The **Instructions** tab stores standing
+preferences that are added to every AI request the app makes.
+
 ### Configuration
 
-Without an API key the app runs in demo mode with sample model output. To use a live model, open
-**Settings → Configure provider** and paste a key for [Groq](https://console.groq.com/keys) or
-[OpenRouter](https://openrouter.ai/keys). The key is stored in this browser's `localStorage` (namespaced to
-this app) and is sent only to the selected provider.
+`src/lib/config.js` is generated from the build settings: the Supabase project (accounts) and the AI proxy URL.
+Signed-in users get the built-in AI through the proxy, which keeps the provider key as a server-side secret.
+Without those settings the app runs for guests, in demo mode, or with a personal [Groq](https://console.groq.com/keys)
+or [OpenRouter](https://openrouter.ai/keys) key entered under **Settings → Model provider** (stored only in this
+browser and sent only to that provider).
 
 ## Testing
 
@@ -74,13 +83,17 @@ Or open `tests/index.html` in a browser ([live](https://dguywhoknows.github.io/r
 ## Project structure
 
 ```
-index.html           markup for every page
+index.html           public home page (generated)
+login.html           sign-in and sign-up (generated)
+app.html             the app: markup for every page
 src/app.js           UI, page wiring and event handlers
 src/core.js          pure logic with no DOM access (unit-tested)
 src/demo.js          sample responses used when no API key is configured
 src/lib/ai.js        LLM client: Groq / OpenRouter, streaming, JSON mode, retries
 src/lib/dom.js       DOM helpers, namespaced storage, markdown renderer
 src/lib/router.js    hash router and the Settings page
+src/lib/copilot.js   AI command box that drives the app's own functions
+src/lib/auth.js      accounts (Supabase Auth) and the sign-in gate
 styles/base.css      design tokens and shared components
 styles/app.css       app-specific styles
 tests/               unit tests (browser runner + Node runner for CI)
