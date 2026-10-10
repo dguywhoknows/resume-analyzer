@@ -2,9 +2,9 @@
 window.APP_CONFIG = {
   "slug": "resume-analyzer",
   "name": "Resume Match",
-  "supabaseUrl": "",
-  "supabaseAnonKey": "",
-  "aiProxy": "",
+  "supabaseUrl": "https://izyyaxovwwvjrladiumv.supabase.co",
+  "supabaseAnonKey": "sb_publishable_nCqQWacYrOdTDGU9yspukA_jQvQoc9I",
+  "aiProxy": "https://ai-proxy.goede-aeb.workers.dev",
   "google": false,
   "prompts": [
     {
