@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tests · resume-analyzer</title>
+<link rel="stylesheet" href="../styles/base.css">
+<style>
+  main { max-width: 860px; }
+  .t { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .t .e { grid-column: 2 / 4; color: var(--bad); font: 12px var(--mono); }
+</style>
+</head>
+<body>
+<main class="stack">
+  <h1>resume-analyzer: unit tests</h1>
+  <p class="muted">The same suite runs in CI on every push (<code>node tests/run-node.js</code>). <a href="../">Back to the app</a></p>
+  <div class="card"><div id="sum" class="row"><span class="spinner"></span> running…</div><div id="out"></div></div>
+</main>
+<script src="harness.js"></script>
+<script src="../src/core.js"></script>
+<script src="core.test.js"></script>
+<script>
+runTests().then((rs) => {
+  const fail = rs.filter((r) => !r.ok).length;
+  document.getElementById('sum').innerHTML = `<span class="tag ${fail ? 'bad' : 'good'}">${rs.length - fail}/${rs.length} passed</span>`;
+  document.getElementById('out').innerHTML = rs.map((r) => `<div class="t"><span>${r.ok ? '✓' : '✗'}</span><span>${r.name.replace(/</g, '&lt;')}</span><span class="small muted">${r.ms} ms</span>${r.ok ? '' : `<div class="e">${r.err.replace(/</g, '&lt;')}</div>`}</div>`).join('');
+  window.__testResults = rs;
+});
+</script>
+</body>
+</html>

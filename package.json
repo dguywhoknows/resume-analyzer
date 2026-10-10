@@ -1,0 +1,16 @@
+{
+  "name": "resume-analyzer",
+  "version": "2.0.0",
+  "private": true,
+  "description": "ATS-style keyword coverage, bullet-quality linting and AI rewrites that tailor your resume to a specific job.",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "test": "node tests/run-node.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dguywhoknows/resume-analyzer.git"
+  },
+  "homepage": "https://dguywhoknows.github.io/resume-analyzer/",
+  "license": "MIT"
+}
