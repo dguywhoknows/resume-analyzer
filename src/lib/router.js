@@ -1,4 +1,4 @@
-/* router.js — hash router for multi-page apps.
+/* Hash router for multi-page apps.
  * Every <div class="page" data-page="id" data-title="Title" data-icon="…"> becomes a page; the nav
  * ([data-nav]) is generated from them. Pages are shown with `display: contents`, so each page keeps the
  * layout it would have as a direct child of <body>. A standard Settings page is rendered automatically.

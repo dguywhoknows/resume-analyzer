@@ -1,4 +1,4 @@
-/* demo.js — sample resume, job and canned model output used without an API key. */
+/* Sample resume, job and canned model output used without an API key. */
 var DEMO = {
   resume: `JORDAN LEE
 jordan.lee@example.com · github.com/jordanlee · Toronto, ON

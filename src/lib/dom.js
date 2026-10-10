@@ -1,4 +1,4 @@
-/* dom.js — DOM helpers, toasts, downloads, namespaced storage and a tiny markdown renderer. */
+/* DOM helpers, toasts, downloads, namespaced storage and a tiny markdown renderer. */
 (function () {
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];

@@ -1,5 +1,5 @@
 /*
- * copilot.js — "tell the app what to do". A command box that turns a plain-language request into calls to the
+ * "tell the app what to do". A command box that turns a plain-language request into calls to the
  * app's own functions, plus standing instructions that shape every AI feature in the app.
  *
  *   Copilot.register({
@@ -10,7 +10,7 @@
  *   });
  *
  * Actions marked query: true return information; their results are sent back to the model for a final answer.
- * Open with the floating button or Ctrl/Cmd+K.
+ * Open with the Ask button in the header or Ctrl/Cmd+K.
  */
 (function () {
   const { h, esc, toast } = Kit;
@@ -75,18 +75,20 @@ Rules: use only the listed actions and their arguments; chain several actions wh
   let panel, logEl, input, prefsEl;
   function build() {
     if (panel) return;
-    const fab = h('button', { class: 'copilot-fab', type: 'button', title: 'Tell the app what to do (Ctrl+K)', onclick: () => toggle(true) }, h('span', { class: 'copilot-dot' }), 'Ask AI');
+    const slot = document.querySelector('.top-actions'), mac = /Mac|iPhone|iPad/.test(navigator.platform);
+    const fab = h('button', { class: 'btn copilot-trigger' + (slot ? '' : ' copilot-fab'), type: 'button', title: 'Tell the app what to do', onclick: () => toggle() }, 'Ask', h('kbd', {}, mac ? '⌘K' : 'Ctrl K'));
     input = h('textarea', { rows: 2, placeholder: 'Tell it what you want, in your own words', 'aria-label': 'Request', onkeydown: (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); } } });
     logEl = h('div', { class: 'copilot-log' });
     prefsEl = h('textarea', { rows: 5, 'aria-label': 'Standing instructions', placeholder: 'e.g. Keep answers short. I am a beginner. Use metric units.' });
     const tabs = h('div', { class: 'tabs' }, h('button', { class: 'on', 'data-t': 'cmd', onclick: () => tab('cmd') }, 'Command'), h('button', { 'data-t': 'prefs', onclick: () => tab('prefs') }, 'Instructions'));
     panel = h('section', { class: 'copilot hidden', role: 'dialog', 'aria-label': 'AI command box' },
-      h('div', { class: 'row between' }, h('b', {}, 'Tell ' + (C.name || 'the app') + ' what to do'), h('button', { class: 'btn ghost sm', 'aria-label': 'Close', onclick: () => toggle(false) }, '×')),
+      h('div', { class: 'row between' }, h('b', {}, 'Ask ' + (C.name || 'the app')), h('button', { class: 'btn ghost sm', 'aria-label': 'Close', onclick: () => toggle(false) }, '×')),
       tabs,
       h('div', { 'data-pane': 'cmd', class: 'stack' }, logEl, h('div', { class: 'copilot-ex' }, (spec.examples || []).map((x) => h('button', { class: 'btn ghost sm', type: 'button', onclick: () => { input.value = x; input.focus(); } }, x))), h('div', { class: 'row' }, input, h('button', { class: 'btn primary', type: 'button', onclick: submit }, 'Run'))),
       h('div', { 'data-pane': 'prefs', class: 'stack hidden' }, h('p', { class: 'small muted', style: 'margin:0' }, 'Standing instructions apply to every AI feature in this app, every time.'), prefsEl,
         h('div', { class: 'row' }, h('button', { class: 'btn primary sm', type: 'button', onclick: () => { AI.setInstructions(prefsEl.value); toast(prefsEl.value.trim() ? 'Instructions saved' : 'Instructions cleared'); } }, 'Save'), h('button', { class: 'btn ghost sm', type: 'button', onclick: () => { prefsEl.value = ''; AI.setInstructions(''); } }, 'Clear'))));
-    document.body.append(fab, panel);
+    if (slot) slot.prepend(fab); else document.body.append(fab);
+    document.body.append(panel);
     renderPrefs(); renderLog();
   }
   function tab(t) { panel.querySelectorAll('.tabs button').forEach((b) => b.classList.toggle('on', b.dataset.t === t)); panel.querySelectorAll('[data-pane]').forEach((p) => p.classList.toggle('hidden', p.dataset.pane !== t)); }
@@ -107,7 +109,7 @@ Rules: use only the listed actions and their arguments; chain several actions wh
   document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); toggle(); } if (e.key === 'Escape' && open) toggle(false); });
 
   window.Copilot = {
-    register(s) { spec = Object.assign({ actions: [], context: () => '', examples: (C.prompts || []).map((p) => p.say || p) }, s); if (panel) { panel.remove(); document.querySelector('.copilot-fab')?.remove(); panel = null; } build(); },
+    register(s) { spec = Object.assign({ actions: [], context: () => '', examples: (C.prompts || []).map((p) => p.say || p) }, s); if (panel) { panel.remove(); document.querySelector('.copilot-trigger')?.remove(); panel = null; } build(); },
     run, exec, actions: () => describe(), open: () => toggle(true),
   };
   window.addEventListener('ai:change', renderLog);

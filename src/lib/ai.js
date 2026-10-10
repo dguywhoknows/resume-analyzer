@@ -1,5 +1,5 @@
 /*
- * ai.js — tiny browser AI client for this app.
+ * Tiny browser AI client for this app.
  *
  * Providers:
  *   - Built-in    the site's own AI proxy (APP_CONFIG.aiProxy), used by signed-in users; the provider key

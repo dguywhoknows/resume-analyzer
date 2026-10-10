@@ -1,5 +1,5 @@
 /*
- * auth.js — accounts via Supabase Auth.
+ * Accounts via Supabase Auth.
  *
  * Load right after config.js in <head>. On the app page it redirects to login.html when nobody is signed in
  * (unless accounts are not configured yet, or the page is embedded as a demo with ?embed=1).

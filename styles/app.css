@@ -1,4 +1,4 @@
-:root { --accent: #1f8f5f; }
+:root { --accent: #355e8c; }
 #resume, #jd { font-size: 13px; min-height: 340px; }
 .score-card { display: flex; align-items: center; gap: 16px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
